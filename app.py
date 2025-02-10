@@ -5,6 +5,7 @@ import re
 import os
 import time
 import io
+import time
 
 app = Flask(__name__)
 
@@ -522,6 +523,12 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
     Returns:
         dict: pages_status. Keys = Page IDs, and Values = Status of the downloaded page: 'EMPTY_PAGE', 'DOWNLOAD_SUCCESFUL', 'DOWNLOAD_FAILED'
     """
+    import time
+
+    # Save timestamp
+    start = time.time()
+    print(f"Start time: {time}")
+
     #Get space id
     space_id = get_confluence_space_id_by_key(domain, email, api_token, space_key)
     if not space_id:
@@ -561,6 +568,10 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
         add_value_to_dict(dictionary=pages_status, key=page_status, value=page_id)
         
     print(pages_status)
+    
+    # Save timestamp
+    end = time.time()
+    print(f"End time: {end}, End - start: {end - start}")
     return pages_status
     
 @app.route('/export_pdf_space', methods=['POST'])

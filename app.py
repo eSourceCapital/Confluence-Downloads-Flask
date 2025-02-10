@@ -6,6 +6,7 @@ import os
 import time
 import io
 import time
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -527,7 +528,7 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
 
     # Save timestamp
     start = time.time()
-    print(f"Start time: {time}")
+    print(f"Start time: {datetime.now()}")
 
     #Get space id
     space_id = get_confluence_space_id_by_key(domain, email, api_token, space_key)
@@ -571,7 +572,7 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
     
     # Save timestamp
     end = time.time()
-    print(f"End time: {end}, End - start: {end - start}")
+    print(f"End time: {datetime.now()}, End - start: {end - start}")
     return pages_status
     
 @app.route('/export_pdf_space', methods=['POST'])

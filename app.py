@@ -124,6 +124,34 @@ def get_confluence_children_by_parent_page_id_recursive(domain: str, email: str,
 
     return pages_ids_dict
 
+def get_confluence_pages_by_space_id_limit(domain: str, email: str, api_token: str, space_id: str, limit=250):
+    """
+    Fetches all Confluence pages from a Space ID, limit <= 250, without pagination.
+    Refer to: https://developer.atlassian.com/cloud/confluence/rest/v2/api-group-page/#api-spaces-id-pages-get
+    
+    Args:
+        domain (str): The Confluence instance domain (e.g., 'your-domain.atlassian.net').
+        email (str): The email address of the Confluence user.
+        api_token (str): The API token for authentication.
+        space_id (str): The ID of the space to fetch details for.
+
+    Returns:
+        list: A list of all pages retrieved from Confluence.
+    """
+    limit = abs(limit) if limit <= 250 else 250
+    url = f"https://{domain}/wiki/api/v2/spaces/{space_id}/pages"
+    auth = HTTPBasicAuth(email, api_token)
+    headers = {"Accept": "application/json"}
+    params = {"limit": limit}  # Fetch the max number per request
+    response = requests.get(url, headers=headers, auth=auth, params=params)
+    data = handle_json_errors(response)
+    if 'error' in data:
+        return []
+    if 'results' not in data:
+        print(f"Error: 'results' field missing when fetching children")
+        return []
+    return data["results"]
+
 def get_confluence_pages_by_space_id(domain: str, email: str, api_token: str, space_id: str):
     """
     Fetches all Confluence pages from a Space ID, handling pagination.
@@ -165,27 +193,6 @@ def get_confluence_pages_by_space_id(domain: str, email: str, api_token: str, sp
             url = None  # No more pages
 
     return all_pages
-
-def get_confluence_pages_by_space_id_dict(domain: str, email: str, api_token: str, space_id: str):
-    """
-    Fetches all Confluence pages from a Space ID, handling pagination.
-    Returns a dictionary with only the page id and title.
-    Refer to: https://developer.atlassian.com/cloud/confluence/rest/v2/api-group-page/#api-spaces-id-pages-get
-    
-    Args:
-        domain (str): The Confluence instance domain (e.g., 'your-domain.atlassian.net').
-        email (str): The email address of the Confluence user.
-        api_token (str): The API token for authentication.
-        space_id (str): The ID of the space to fetch details for.
-
-    Returns:
-        dict: All page ids and titles
-    """
-    all_pages = get_confluence_pages_by_space_id(domain, email, api_token, space_id)
-    pages_ids_dict = {}
-    for page in all_pages:
-        pages_ids_dict[page['id']] = page['title']
-    return pages_ids_dict
   
 def get_pdf_export_confluence_url(domain, email, api_token, page_id):
     """
@@ -528,8 +535,12 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
     print(f"Homepage ID: {homepage_id}")
 
     #Get all pages
-    #pages_ids_dict = get_confluence_children_by_parent_page_id_recursive(domain, email, api_token, homepage_id)
-    pages_ids_dict = get_confluence_pages_by_space_id_dict(domain, email, api_token, space_id)
+    #pages_ids_dict = get_confluence_children_by_parent_page_id_recursive(domain, email, api_token, homepage_id)  
+    all_pages = get_confluence_pages_by_space_id(domain, email, api_token, space_id)
+    #all_pages = get_confluence_pages_by_space_id_limit(domain, email, api_token, space_id, limit=250)
+    pages_ids_dict = {}
+    for page in all_pages:
+        pages_ids_dict[page['id']] = page['title']
     print(f"Page IDs and titles. Length {len(pages_ids_dict)}, Dictionary: {pages_ids_dict}")
     
     #Store status of pages

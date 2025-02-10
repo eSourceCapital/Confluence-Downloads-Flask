@@ -1,0 +1,5 @@
+.DS_Store
+.env
+tests.txt
+pdf_downloads_escala/
+pdf_downloads_sb/

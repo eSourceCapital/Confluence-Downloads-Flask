@@ -559,7 +559,11 @@ def export_pdf_confluence_space_by_key(domain, email, api_token, space_key, outp
     pages_status = {}
     
     #Download pages
+    count = 0
     for page_id, page_title in pages_ids_dict.items():
+        count += 1
+        if count % 25 == 0: #Multiples of 25
+            print(f"Document #{count}: {datetime.now()}")
         page_status = export_pdf_confluence_page_by_id(
             domain=domain,
             email=email,

@@ -404,10 +404,10 @@ def download_pdf_from_presigned_url_to_gcs_bucket(url, filename, gcs_bucket_name
     
     return {"statusCode": response.status_code}
       
-def convert_title_to_filename(title):
+def convert_title_to_filename(title, max_length=100):
     """
     Converts a title string to a safe filename format by replacing spaces with underscores
-    and removing non-word characters.
+    and removing non-word characters, then truncating to a max length.
 
     Args:
         title (str): The title to be converted.
@@ -415,7 +415,11 @@ def convert_title_to_filename(title):
     Returns:
         str: The converted filename with spaces replaced by underscores and non-word characters removed.
     """
-    return re.sub(r'\W+', '', title.strip().replace(' ', '_'))
+    # Replace spaces with underscores and remove non-word characters
+    result = re.sub(r'\W+', '', title.strip().replace(' ', '_'))
+    
+    # Truncate to max_length while ensuring the file extension is preserved if present
+    return result[:max_length].rstrip('_')
 
 def add_value_to_dict(dictionary, key, value):
     """Adds a value to a dictionary at a given key.

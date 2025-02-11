@@ -2,4 +2,6 @@
 .env
 tests.txt
 pdf_downloads_escala/
+pdf_downloads_escala_old/
 pdf_downloads_sb/
+pdf_downloads_sb_old/
